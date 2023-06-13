@@ -1,33 +1,39 @@
 class Solution {
     public int equalPairs(int[][] grid) {
-        int pair=0;
-        int temp=0;
-        int row=0;
-        while(temp<=grid.length-1)
-        {
-            HashMap<Integer,Integer> map=new HashMap<>();
-            for(int j=0;j<grid.length;j++)
-            {
-                map.put(j,grid[row][j]);
+        
+        int n = grid.length; // Get the size of the grid (assuming it's a square grid)
+        long[] rowSums = new long[n]; // Create an array to store the sums of rows
+        long[] colSums = new long[n]; // Create an array to store the sums of columns
+
+        // Calculate row sums
+        for (int i = 0; i < n; i++) { // Iterate through each row
+            long sum = 0;
+            for (int j = 0; j < n; j++) { // Iterate through each element in the row
+                sum = sum * 10 + grid[i][j]; // Calculate the sum of the row using base 10 arithmetic
             }
-            for(int i=0;i<grid.length;i++)
-            {
-                int curr=0;
-                for(int k=0;k<grid.length;k++)
-                {
-                    if(map.get(k)!=grid[k][i])
-                    {
-                        curr=0;
-                        break;
-                    }
-                    else
-                        curr=1;
-                }
-                pair+=curr;
-            }
-            row++;
-            temp++;
+            rowSums[i] = sum; // Store the sum of the row in the rowSums array
         }
-        return pair;
+
+        // Calculate column sums
+        for (int i = 0; i < n; i++) { // Iterate through each column
+            long sum = 0;
+            for (int j = 0; j < n; j++) { // Iterate through each element in the column
+                sum = sum * 10 + grid[j][i]; // Calculate the sum of the column using base 10 arithmetic
+            }
+            colSums[i] = sum; // Store the sum of the column in the colSums array
+        }
+
+        int count = 0; // Initialize a counter for equal row and column pairs
+
+        // Count equal row and column pairs
+        for (int i = 0; i < n; i++) { // Iterate through each row
+            for (int j = 0; j < n; j++) { // Iterate through each column
+                if (rowSums[i] == colSums[j]) { // Compare the sum of the current row with the sum of the current column
+                    count++; // If they are equal, increment the count
+                }
+            }
+        }
+
+        return count; // Return the count of equal row and column pairs
     }
 }
