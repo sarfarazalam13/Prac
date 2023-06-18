@@ -1,37 +1,45 @@
 class Solution {
-    int mod = (int)(1e9+7);
-    public int countPaths(int[][] grid) {
-        int n = grid.length;
-        int m = grid[0].length;
-        
-        int[][] dp = new int[n][m];
-        for(int[] arr: dp){
-            Arrays.fill(arr, -1);
+    private int[][] matrix;
+    private int rowLength, columnLength;
+    private int[][] dp;
+    private int mod = (int)(1e9+7);
+    public int longestIncreasingPath(int row, int col){
+        int longestpath = 1;
+        if(dp[row][col] > 0){
+            return dp[row][col];
         }
-        int paths = 0;
-        for(int i=0; i<n; i++){
-            for(int j=0; j<m; j++){
-                paths = (paths+solve(grid, i, j, -1, dp))%mod;
-            }
+        if(row+1 < this.rowLength && this.matrix[row+1][col] > this.matrix[row][col]){
+            longestpath = (longestpath + longestIncreasingPath(row+1, col))%mod;
         }
         
-        return paths;
+        if(row-1 >= 0 && this.matrix[row-1][col] > this.matrix[row][col]){
+            longestpath = (longestpath + longestIncreasingPath(row-1, col))%mod;
+        }
+        
+        if(col+1 < this.columnLength && this.matrix[row][col+1] > this.matrix[row][col]){
+             longestpath = (longestpath + longestIncreasingPath(row, col+1))%mod;
+        }
+        
+        if(col-1 >= 0 && this.matrix[row][col-1] > this.matrix[row][col]){
+            longestpath = (longestpath + longestIncreasingPath(row, col-1))%mod;
+        }
+        
+        dp[row][col] = longestpath;
+        return longestpath;
     }
     
-    public int solve(int[][] grid, int i, int j, int prev, int[][] dp){
-        if(i<0 || j<0 || i>=grid.length || j>=grid[0].length || grid[i][j]<=prev){
-            return 0;
+    public int countPaths(int[][] grid) {
+        this.matrix = grid;
+        this.rowLength = matrix.length;
+        this.columnLength = matrix[0].length;
+        this.dp = new int[this.rowLength][this.columnLength];
+        
+        int ans = 0;
+        for(int i = 0; i < this.rowLength; i++){
+            for(int j = 0; j < this.columnLength; j++){
+                ans = (ans + longestIncreasingPath(i, j))%mod;
+            }
         }
-        
-        if(dp[i][j]!=-1){
-            return dp[i][j];
-        }
-        
-        int left = solve(grid, i, j-1, grid[i][j], dp);
-        int right = solve(grid, i, j+1, grid[i][j], dp);
-        int up = solve(grid, i-1, j, grid[i][j], dp);
-        int down = solve(grid, i+1, j, grid[i][j], dp);
-        
-        return dp[i][j] = (1+left+right+up+down)%mod;
+        return ans;
     }
 }
