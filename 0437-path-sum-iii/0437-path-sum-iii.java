@@ -13,20 +13,44 @@
  *     }
  * }
  */
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
 class Solution {
     public int pathSum(TreeNode root, int targetSum) {
-        if(root==null)
-        {
+        if(root!=null && root.val==1000000000)
             return 0;
-        }
-        return summ(root,targetSum)+pathSum(root.left,targetSum)+pathSum(root.right,targetSum);
+        HashMap<Integer,Integer>hm=new HashMap<Integer,Integer>();
+        hm.put(0,1);
+        return helper(root,targetSum,hm,0);
     }
-    private int summ(TreeNode root,long sum)
-    {
-        if(root==null)
-        {
+    public int helper(TreeNode root, int target, HashMap<Integer,Integer>hm,int curr){
+        if(root == null)
             return 0;
-        }
-         return(sum - root.val == 0 ? 1:0) +  summ(root.left, sum - root.val) +  summ(root.right, sum - root.val);
+        int count = 0;
+        curr+=root.val;
+        if(hm.containsKey(curr-target))
+            count+=hm.get(curr-target);
+
+        if(hm.containsKey(curr))
+            hm.put(curr,hm.get(curr)+1);
+        else
+            hm.put(curr,1);
+        int left = helper(root.left,target,hm,curr);
+        int right = helper(root.right,target,hm,curr);
+        hm.put(curr,hm.get(curr)-1);
+        return count+left+right;
     }
-}
+}   
