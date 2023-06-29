@@ -1,64 +1,94 @@
 class Solution {
-   class State {
-        int keys, i, j;
-        State(int keys, int i, int j) {
-            this.keys = keys;
-            this.i = i;
-            this.j = j;
-        }
-    }
     public int shortestPathAllKeys(String[] grid) {
-        int x = -1, y = -1, m = grid.length, n = grid[0].length(), totalKeys = 0;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                char c = grid[i].charAt(j);
-                if (c == '@') {
-                    x = i;
-                    y = j;
+        int[] directionRow = new int[]{1, -1, 0, 0};
+        int[] directionColumn = new int[]{0, 0, 1, -1};
+        int rows = grid.length;
+        int columns = grid[0].length();
+        int points = rows * columns;
+        int allKeys = 0;
+        int startPoint = 0;
+        
+        for (int r = 0; r < rows; r++) {
+            String row = grid[r];
+            
+            for (int c = 0; c < columns; c++) {
+                char v = row.charAt(c);
+               
+                if (v == '@') {
+                    startPoint = r * columns + c;
                 }
-                if (c >= 'a' && c <= 'f') {
-                    totalKeys ++;
+                boolean isKey = v >= 'a' && v <= 'f';
+                if (isKey) {
+                    allKeys = (allKeys << 1) | 1;
                 }
             }
         }
-        State start = new State(0, x, y);
-        Queue<State> q = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        visited.add(0 + " " + x + " " + y);
-        q.offer(start);
-        int[][] dirs = new int[][]{{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-        int step = 0;
-        while (!q.isEmpty()) {
-            int size = q.size();
-            while (size-- > 0) {
-                State cur = q.poll();
-                if (cur.keys == (1 << totalKeys) - 1) {
-                    return step;
+        int states = points * (allKeys + 1);
+        int[] queue = new int[states];
+        int queueHead = 0;
+        int queueTail = 0;
+        boolean[] visited = new boolean[states];
+        int distance = 0;
+        int noKeys = 0;
+        int startState = noKeys * points + startPoint;
+        queue[queueHead++] = startState;
+        
+        visited[startState] = true;
+        
+        while (true) {
+            int size = queueHead - queueTail;
+            if (size == 0) {
+                break;
+            }
+            while (--size >= 0) {
+                int state = queue[queueTail++];
+                int keys = state / points;
+                int point = state % points;
+                int row = point / columns;
+                int column = point % columns;
+
+                if (keys == allKeys) {
+                    return distance;
                 }
-                for (int[] dir : dirs) {
-                    int i = cur.i + dir[0];
-                    int j = cur.j + dir[1];
-                    int keys = cur.keys;
-                    if (i >= 0 && i < m && j >= 0 && j < n) {
-                        char c = grid[i].charAt(j);
-                        if (c == '#') {
+                for (int i = 0; i < 4; i++) {
+                    int nextRow = row + directionRow[i];
+                    int nextColumn = column + directionColumn[i];
+                    if (nextRow < 0 || nextColumn < 0 || nextRow >= rows || nextColumn >= columns) {
+                        continue;
+                    }
+                    char v = grid[nextRow].charAt(nextColumn);
+                    if (v == '#') {
+                        continue;
+                    }
+                    int nextKey = keys;
+                    if (v != '.') {
+                        boolean isLock = v >= 'A' && v <= 'F';
+                        if (isLock && !isOpen(keys, v)) {
                             continue;
                         }
-                        if (c >= 'a' && c <= 'f') {
-                            keys |= 1 << (c - 'a');
+                        boolean isKey = v >= 'a' && v <= 'f';
+                        if (isKey) {
+                            nextKey = addKey(nextKey, v);
                         }
-                        if (c >= 'A' && c <= 'F' && ((keys >> (c - 'A')) & 1) == 0) {
-                            continue;
-                        }
-                        if (!visited.contains(keys + " " + i + " " + j)) {
-                            visited.add(keys + " " + i + " " + j);
-                            q.offer(new State(keys, i, j));
-                        }
+                    }
+                    int nextPoint = nextRow * columns + nextColumn;
+                    int nextState = nextKey * points + nextPoint;
+                    if (!visited[nextState]) {
+                        queue[queueHead++] = nextState;
+                        visited[nextState] = true;
                     }
                 }
             }
-            step++;
+            distance++;
         }
         return -1;
+    }
+    public int addKey(int keys, char key) {
+        int keyId = 1 << (key - 'a');
+        return keys | keyId;
+    }
+    public boolean isOpen(int keys, char lock) {
+        int lockId = 1 << (lock - 'A');
+        return (keys & lockId) > 0;
     }
 }
