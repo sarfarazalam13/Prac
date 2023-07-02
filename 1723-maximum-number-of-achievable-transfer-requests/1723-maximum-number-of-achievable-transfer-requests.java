@@ -1,29 +1,32 @@
 class Solution {
+    int ans = 0;
     public int maximumRequests(int n, int[][] requests) {
-        int[] indegree = new int[n];
-        return helper(0, requests, indegree, n, 0);
+        int[] degree = new int[n];
+        permitReq(requests, 0, degree, 0);
+        return ans;
     }
-
-    public int helper(int start, int[][] requests, int[] indegree, int n, int count) {
-        if (start == requests.length) {
-            for (int i = 0; i < n; i++) {
-                if (indegree[i] != 0) {
-                    return 0;
-                }
+    
+    void permitReq(int[][] req, int ind, int[] degree, int temp){
+        if(ind == req.length){
+            for(int i = 0 ; i < degree.length ; i++){
+                if(degree[i] != 0)
+                    return;
             }
-            return count;
+            ans = Math.max(ans, temp);
+            return;
         }
-
-        // Take 
-        indegree[requests[start][0]]--;
-        indegree[requests[start][1]]++;
-        int take = helper(start + 1, requests, indegree, n, count + 1);
-
-        // Not-take
-        indegree[requests[start][0]]++;
-        indegree[requests[start][1]]--;
-        int notTake = helper(start + 1, requests, indegree, n, count);
-
-        return Math.max(take, notTake);
+            
+        int i = req[ind][0];
+        int j = req[ind][1];
+        
+//         Permit the request at index ind
+        degree[i] = degree[i]-1;
+        degree[j] = degree[j]+1;
+        permitReq(req, ind+1, degree, temp+1);
+        
+//         Reject the request at index ind
+        degree[i] = degree[i]+1;
+        degree[j] = degree[j]-1;
+        permitReq(req, ind+1, degree, temp);
     }
 }
