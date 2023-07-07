@@ -1,21 +1,10 @@
-
 class Solution {
-    public int maxConsecutiveAnswers(String answerKey, int k) {
-        int maxFreq = 0;
-        int i = 0;
-        Map<Character, Integer> charCount = new HashMap<>();
-
-        for (int j = 0; j < answerKey.length(); j++) {
-            char currentChar = answerKey.charAt(j);
-            charCount.put(currentChar, charCount.getOrDefault(currentChar, 0) + 1);
-            maxFreq = Math.max(maxFreq, charCount.get(currentChar));
-
-            if (j - i + 1 > maxFreq + k) {
-                charCount.put(answerKey.charAt(i), charCount.get(answerKey.charAt(i)) - 1);
-                i++;
-            }
-        }
-
-        return answerKey.length() - i;
-    }
+	public int maxConsecutiveAnswers(String answerKey, int k) {
+		char[] chars = answerKey.toCharArray();
+		int result = 0, max = 0, count[] = new int[128];
+		for (int i = 0; i < chars.length; i++)
+			if (result - (max = Math.max(max, ++count[chars[i]])) < k) result++;
+			else count[chars[i - result]]--;
+		return result;
+	}
 }
