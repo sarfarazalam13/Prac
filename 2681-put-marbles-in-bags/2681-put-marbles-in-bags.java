@@ -1,14 +1,16 @@
 class Solution {
-        public long putMarbles(int[] A, int k) {
-        int n = A.length - 1;
-        long B[] = new long[n], res = 0;
-        for (int i = 0; i < B.length; i++) {
-            B[i] = A[i] + A[i + 1];
+    public long putMarbles(int[] weights, int k) {
+        // all partition points
+        int[] costs = new int[weights.length - 1];
+        for (int i = 0; i < weights.length - 1; i++) {
+            costs[i] = weights[i] + weights[i+1];
         }
-        Arrays.sort(B);
+        Arrays.sort(costs);
+        long min = 0, max = 0;
         for (int i = 0; i < k - 1; i++) {
-            res += B[n - 1 - i] - B[i];
+            min += costs[i];
+            max += costs[costs.length - 1 - i];
         }
-        return res;
+        return max - min;
     }
-    }
+}
