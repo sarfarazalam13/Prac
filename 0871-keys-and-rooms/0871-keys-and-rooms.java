@@ -1,24 +1,20 @@
 class Solution {
     public boolean canVisitAllRooms(List<List<Integer>> rooms) {
-        int n=rooms.size();
-        boolean[] vis=new boolean[n];
-        int visitedN=0;
-        visit(rooms,0,vis);
-        for(int i=0; i<n; i++){
-            if(vis[i]) visitedN++;
-        }
-        if(visitedN == n) return true;
-        else return false;
+        int n = rooms.size();
+        boolean[] visited = new boolean[n];
+        int ans = helper(rooms, visited, 0,n);
+        return ans == n;
     }
-    void visit(List<List<Integer>> rooms, int i, boolean [] visited) {
-        if(visited[i]) return;
-
-
-        visited[i] = true;
-
-        List<Integer> keys = rooms.get(i);
-        for(Integer next : keys){
-            visit(rooms, next, visited);
+    public int helper(List<List<Integer>> rooms, boolean[] visited, int curr, int n) {
+        if(visited[curr]) {
+            return 0;
         }
-}
+        visited[curr] = true;
+        int ans = 1;
+        for(int i = 0; i<rooms.get(curr).size(); i++) {
+            List<Integer> keys = rooms.get(curr);
+            ans += helper(rooms, visited, keys.get(i), n);
+        }
+        return ans;
+    }
 }
