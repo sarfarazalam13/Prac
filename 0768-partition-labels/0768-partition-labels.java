@@ -1,25 +1,34 @@
 class Solution {
     public List<Integer> partitionLabels(String s) {
-        Map<Character, Integer> map = new HashMap<>();
-        // filling impact of character's
-        for(int i = 0; i < s.length(); i++){
-            char ch = s.charAt(i);
-            map.put(ch, i);
-        }
-        // making of result
-        List<Integer> res = new ArrayList<>();
-        int prev = -1;
-        int max = 0;
-        
-        for(int i = 0; i < s.length(); i++){
-            char ch = s.charAt(i);
-            max = Math.max(max, map.get(ch));
-            if(max == i){
-                // partition time
-                res.add(max - prev);
-                prev = max;
+        List<Integer>list=new ArrayList<>();
+        char []arr=s.toCharArray();
+        int temp=0;
+        int []vis=new int[26];
+        int lastVal=0;
+        for(int i=0;i<arr.length;i++)
+        {
+            char ch=arr[i];
+            vis[ch-'a']=1;
+            temp=s.lastIndexOf(ch);
+            
+            while(i<=temp)
+            {
+                if(vis[arr[i]-'a']==1)
+                {
+                    i++;
+                    continue;
+                }
+                ch=arr[i];
+                vis[ch-'a']=1;
+                temp=Math.max(s.lastIndexOf(ch),temp);
+                //System.out.println(temp);
+                i++;
             }
+
+            list.add(i-lastVal);
+            lastVal=i;
+            i--;
         }
-        return res;
+        return list;
     }
 }
