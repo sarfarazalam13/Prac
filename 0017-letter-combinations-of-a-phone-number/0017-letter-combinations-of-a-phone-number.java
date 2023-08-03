@@ -1,21 +1,37 @@
 class Solution {
-    public List<String> letterCombinations(String digits) {
-        if (digits.isEmpty()) return Collections.emptyList();
 
-        String[] phone_map = {"abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
-        List<String> output = new ArrayList<>();
-        backtrack("", digits, phone_map, output);
-        return output;
+    char[][] buttons = new char[][]{
+            {'a', 'b', 'c'},
+            {'d', 'e', 'f'},
+            {'g', 'h', 'i'},
+            {'j', 'k', 'l'},
+            {'m', 'n', 'o'},
+            {'p', 'q', 'r', 's'},
+            {'t', 'u', 'v'},
+            {'w', 'x', 'y', 'z'}
+    };
+    List<String> res;
+
+    public List<String> letterCombinations(String digits) {
+        if (digits.length() == 0) return new ArrayList<>();
+        res = new ArrayList<>();
+        traverse(1, buttons[digits.charAt(0) - '0' - 2], digits, new StringBuilder());
+        return res;
     }
 
-    private void backtrack(String combination, String next_digits, String[] phone_map, List<String> output) {
-        if (next_digits.isEmpty()) {
-            output.add(combination);
-        } else {
-            String letters = phone_map[next_digits.charAt(0) - '2'];
-            for (char letter : letters.toCharArray()) {
-                backtrack(combination + letter, next_digits.substring(1), phone_map, output);
+    private void traverse(int idx, char[] button, String digits, StringBuilder sb) {
+        if (sb.length() >= digits.length()) {
+            res.add(sb.toString());
+            return;
+        }
+        for (int i = 0; i < button.length; i++) {
+            sb.append(button[i]);
+            if (idx >= digits.length()) {
+                traverse(idx + 1, button, digits, sb);
+            } else {
+                traverse(idx + 1, buttons[digits.charAt(idx) - '0' - 2], digits, sb);
             }
+            sb.setLength(sb.length() - 1);
         }
     }
 }
