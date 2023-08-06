@@ -1,23 +1,20 @@
 class Solution {
-    private final long MOD = (long)1e9+7;
     public int numMusicPlaylists(int n, int goal, int k) {
-        Long[][] dp = new Long[101][101];
-        return (int)solve(n, goal, k, dp, 0, 0);
-    }
+        int modulo = 1_000_000_007;
 
-    public long solve(int n, int goal, int k, Long[][] dp, int playListSize, int songs){
-        
-        // playList is full we cannot add any more song
-        if(playListSize == goal) return n == songs ? 1 : 0;
+        long[] dp = new long[goal - n + 1];
+        Arrays.fill(dp, 1);
 
-        if(null != dp[playListSize][songs]) return dp[playListSize][songs];
-
-        // scenario -1: if songs - K is negative means we have not yet played enough K unique songs so cannot repeat song
-        // otherwise songs - k options we have to repeat so multiply it
-        long repeat = (solve(n, goal, k, dp, playListSize + 1, songs) * Math.max(0, songs - k)) % MOD;
-        
-        //scenario - 2 : select unique song, so now we are left with (n-songs) options to select from so multiply it
-        long unique = (solve(n, goal, k, dp, playListSize + 1, songs+1) * (n - songs)) % MOD;
-        return dp[playListSize][songs] = (repeat + unique) % MOD;
+        for (int p = 2; p <= n - k; ++p) {
+            for (int i = 1; i <= goal - n; ++i) {
+                dp[i] += dp[i - 1] * p;
+                dp[i] %= modulo;
+            }
+        }
+        long result = dp[goal - n];
+        for (int key = 2; key <= n; ++key) {
+            result = result * key % modulo;
+        }
+        return (int) result;
     }
 }
