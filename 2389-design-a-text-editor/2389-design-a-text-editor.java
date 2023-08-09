@@ -1,42 +1,47 @@
 class TextEditor {
+    private StringBuilder left = new StringBuilder();
+    private StringBuilder right = new StringBuilder();
 
-    StringBuilder sb;
-    int cursor;
     public TextEditor() {
-        sb = new StringBuilder();
-        cursor = 0;
     }
 
     public void addText(String text) {
-        sb.replace(cursor, cursor, text);
-        cursor += text.length();
+        left.append(text);
     }
 
     public int deleteText(int k) {
-        if (k >= cursor) {
-            sb.replace(0, cursor, "");
-            int temp = cursor;
-            cursor = 0;
-            return temp;
-        } else {
-            sb.replace(cursor - k, cursor, "");
-            cursor -= k;
-            return k;
-        }
+        k = Math.min(k, left.length());
+        left.setLength(left.length() - k);
+        return k;
     }
 
     public String cursorLeft(int k) {
-        cursor = Math.max(0, cursor - k);
-        int len = Math.min(10, cursor);
-        return sb.substring(cursor - len, cursor);
+        k = Math.min(k, left.length());
+        for (int i = 0; i < k; ++i) {
+            right.append(left.charAt(left.length() - 1));
+            left.deleteCharAt(left.length() - 1);
+        }
+        return left.substring(Math.max(left.length() - 10, 0));
     }
 
     public String cursorRight(int k) {
-        cursor = Math.min(cursor + k, sb.length());
-        int len = Math.min(10, cursor);
-        return sb.substring(cursor - len, cursor);
+        k = Math.min(k, right.length());
+        for (int i = 0; i < k; ++i) {
+            left.append(right.charAt(right.length() - 1));
+            right.deleteCharAt(right.length() - 1);
+        }
+        return left.substring(Math.max(left.length() - 10, 0));
     }
 }
+
+/**
+ * Your TextEditor object will be instantiated and called as such:
+ * TextEditor obj = new TextEditor();
+ * obj.addText(text);
+ * int param_2 = obj.deleteText(k);
+ * String param_3 = obj.cursorLeft(k);
+ * String param_4 = obj.cursorRight(k);
+ */
 
 /**
  * Your TextEditor object will be instantiated and called as such:
