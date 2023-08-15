@@ -1,33 +1,33 @@
 class TreeAncestor {
-    int a[][];
-    public TreeAncestor(int n, int[] parent) {
-        a=new int[n][21];
-        for(int i=0;i<n;i++)
-        a[i][0]=parent[i];
-        for(int i=1;i<21;i++)
-        {
-            for(int j=0;j<n;j++)
-            {
-                if(a[j][i-1]==-1)
-                a[j][i]=-1;
-                else
-                a[j][i]=a[a[j][i-1]][i-1];
-            }
-        }
-    }
     
-    public int getKthAncestor(int node, int k) {
-        int curr=node;
-        for(int i=20;i>=0;i--)
-        {
-            if(curr==-1)
-            break;
-            int ans=k & (1<<i);
-            if(ans!=0)
-            curr=a[curr][i];
-        }
-        return curr;
+  int MAX_ROWS = 16;
+  int table[][];
+
+  public TreeAncestor(int n, int[] parent) {
+    table = new int[MAX_ROWS][n];
+    for (int i = 0; i < n; i++) {
+      table[0][i] = parent[i];
     }
+    for (int i = 1; i < MAX_ROWS; i++) {
+      for (int j = 0; j < n; j++) {
+        if (table[i - 1][j] == -1) table[i][j] = -1; else table[i][j] =
+          table[i - 1][table[i - 1][j]];
+      }
+    }
+  }
+
+  public int getKthAncestor(int node, int k) {
+    int j = node;
+    int ans = 0;
+    for (int i = 15; i >= 0; i--) {
+      if (j == -1) return -1;
+      int mask = 1 << i;
+      if ((mask & k) != 0) {
+        j = table[i][j];
+      }
+    }
+    return j;
+  }
 }
 
 /**
