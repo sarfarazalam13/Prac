@@ -1,114 +1,117 @@
 class Solution {
     public List<List<Integer>> findCriticalAndPseudoCriticalEdges(int n, int[][] edges) {
-        int[][][] graph = new int[n][n][2]; // {weight, index}
-        for (int i = 0; i < edges.length; i++) {
-            int[] edge = edges[i];
-            int from = edge[0];
-            int to = edge[1];
-            int weight = edge[2];
-            graph[from][to][0] = weight;
-            graph[to][from][0] = weight;
-            graph[from][to][1] = i;
-            graph[to][from][1] = i;
+        List<List<Integer>> ans = new ArrayList<>(2);
+        ans.add(new ArrayList<>());
+        ans.add(new ArrayList<>());
+        int m = edges.length;
+        int[][] es = new int[m][4];
+        for (int i = 0; i < m; i++) {
+            es[i][0] = edges[i][0];
+            es[i][1] = edges[i][1];
+            es[i][2] = edges[i][2];
+            es[i][3] = i;
         }
-
-        List<Integer>[] minimumSpanningTree = new List[n];
-        for (int i = 0; i < n; i++) {
-            minimumSpanningTree[i] = new LinkedList<>();
+        Arrays.sort(es, (a, b) -> a[2] - b[2]);
+        List<List<int[]>> buffer = new ArrayList<>();
+        List<int[]> cur = new ArrayList<>();
+        cur.add(es[0]);
+        for (int i = 1; i < m; ++i) {
+            int[] e = es[i];
+            if (cur.get(0)[2] < e[2]) {
+                buffer.add(cur);
+                cur = new ArrayList<>();
+            }
+            cur.add(e);
         }
-
-        boolean[] mstEdgeSet = new boolean[edges.length];
-
-        Arrays.sort(edges, (a, b) -> Integer.compare(a[2], b[2]));
-
-        buildMinimumSpanningTree(n, edges, mstEdgeSet, minimumSpanningTree, graph);
-
-        List<List<Integer>> result = new ArrayList<>(2);
-        Set<Integer> pseudoCriticalEdges = new HashSet<>();
-        List<Integer> criticalEdges = new LinkedList<>();
-
-        // Finding pseudo-critical edges
-        for (int i = 0; i < edges.length; i++) {
-            int from = edges[i][0], to = edges[i][1];
-            int weight = edges[i][2];
-            int index = graph[from][to][1];
-            if (!mstEdgeSet[index]) {
-                Set<Integer> currentSet = new HashSet<>();
-                boolean isPseudoCritical = isPath(from, to, weight, -1, minimumSpanningTree, graph, currentSet);
-                if (isPseudoCritical && currentSet.size() > 0) {
-                    pseudoCriticalEdges.addAll(currentSet);
-                    pseudoCriticalEdges.add(index);
+        buffer.add(cur);
+        UF uf = new UF(n);
+        for (List<int[]> slot: buffer) {
+            int l = slot.size();
+            List<int[]> candidates = new ArrayList<>();
+            for (int i = 0; i < l; ++i) {
+                int[] e = slot.get(i);
+                if (uf.isConnected(e[0], e[1])) {
+                    continue;
                 }
+                candidates.add(e);
             }
-        }
-
-        // Finding critical edges
-        for (int i = 0; i < edges.length; i++) {
-            int from = edges[i][0], to = edges[i][1];
-            int index = graph[from][to][1];
-            if (mstEdgeSet[index] && !pseudoCriticalEdges.contains(index)) {
-                criticalEdges.add(index);
-            }
-        }
-
-        result.add(criticalEdges);
-        result.add(new LinkedList<>(pseudoCriticalEdges));
-        return result;
-    }
-
-    boolean isPath(int from, int to, int weight, int previous, List<Integer>[] minimumSpanningTree, int[][][] graph, Set<Integer> indices) {
-        if (from == to) {
-            return true;
-        }
-        for (int neighbor : minimumSpanningTree[from]) {
-            if (previous != neighbor) {
-                if (isPath(neighbor, to, weight, from, minimumSpanningTree, graph, indices)) {
-                    if (graph[from][neighbor][0] == weight) {
-                        indices.add(graph[from][neighbor][1]);
+            l = candidates.size();
+            for (int i = 0; i < l; ++i) {
+                UF cp = uf.clone();
+                int[] e0 = candidates.get(i);
+                for (int j = 0; j < l; ++j) {
+                    if (j == i) {
+                        continue;
                     }
-                    return true;
+                    int[] e = candidates.get(j);
+                    cp.union(e[0], e[1]);
+                }
+                if (cp.isConnected(e0[0], e0[1])) {
+                    ans.get(1).add(e0[3]);
+                } else {
+                    ans.get(0).add(e0[3]);
                 }
             }
-        }
-        return false;
-    }
-
-    private void buildMinimumSpanningTree(int n, int[][] edges, boolean[] mstEdgeSet, List<Integer>[] minimumSpanningTree, int[][][] graph) {
-        int weight = 0;
-        DisjointSet ds = new DisjointSet(n);
-
-        for (int i = 0; i < edges.length; i++) {
-            if (ds.union(edges[i][0], edges[i][1])) {
-                weight += edges[i][2];
-                int[] edge = edges[i];
-                minimumSpanningTree[edge[0]].add(edge[1]);
-                minimumSpanningTree[edge[1]].add(edge[0]);
-                mstEdgeSet[graph[edge[0]][edge[1]][1]] = true;
+            for (int[] e: candidates) {
+                uf.union(e[0], e[1]);
             }
         }
+        return ans;
     }
-}
 
-class DisjointSet {
-    int[] parent;
+    private static final class UF {
 
-    public DisjointSet(int n) {
-        parent = new int[n];
-        for (int i = 0; i < n; i++) {
-            parent[i] = i;
+        private UF(int n) {
+            this.n = n;
+            this.size = n;
+            parent = new int[size];
+            sz = new int[size];
+            for (int i = 0; i < size; i++) {
+                parent[i] = i;
+                sz[i] = 1;
+            }
         }
-    }
 
-    public int find(int i) {
-        return (i == parent[i]) ? i : (parent[i] = find(parent[i]));
-    }
+        private int[] parent;
+        private int[] sz;
+        private int size;
+        private int n;
 
-    public boolean union(int u, int v) {
-        int pu = find(u), pv = find(v);
-        if (pu == pv) {
-            return false;
+        @Override
+        public UF clone() {
+            UF copy = new UF(1);
+            copy.size = this.size;
+            copy.n = this.n;
+            copy.sz = this.sz.clone();
+            copy.parent = this.parent.clone();
+            return copy;
         }
-        parent[pu] = pv;
-        return true;
+
+        private int find(int x) {
+            if (x == parent[x]) {
+                return x;
+            }
+            return parent[x] = find(parent[x]);
+        }
+
+        private void union(int x, int y) {
+            int xRoot = find(x);
+            int yRoot = find(y);
+            if (xRoot == yRoot) {
+                return;
+            }
+            if (sz[xRoot] > sz[yRoot]) {
+                parent[yRoot] = xRoot;
+                sz[xRoot] += sz[yRoot];
+            } else {
+                parent[xRoot] = yRoot;
+                sz[yRoot] += sz[xRoot];
+            }
+            --size;
+        }
+
+        private boolean isConnected(int x, int y) {
+            return find(x) == find(y);
+        }
     }
 }
