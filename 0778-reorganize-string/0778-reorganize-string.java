@@ -1,34 +1,43 @@
-public class Solution {
+class Solution {
     public String reorganizeString(String s) {
-        HashMap<Character, Integer> freqMap = new HashMap<>();
-        for (char c : s.toCharArray()) {
-            freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+        int[] charCount = new int[26];
+        
+        
+        for (char each : s.toCharArray()) {
+            charCount[each-'a']++;
         }
-
-        PriorityQueue<Character> maxHeap = new PriorityQueue<>((a, b) -> freqMap.get(b) - freqMap.get(a));
-        maxHeap.addAll(freqMap.keySet());
-
-        StringBuilder res = new StringBuilder();
-        while (maxHeap.size() >= 2) {
-            char char1 = maxHeap.poll();
-            char char2 = maxHeap.poll();
-
-            res.append(char1);
-            res.append(char2);
-
-            freqMap.put(char1, freqMap.get(char1) - 1);
-            freqMap.put(char2, freqMap.get(char2) - 1);
-
-            if (freqMap.get(char1) > 0) maxHeap.add(char1);
-            if (freqMap.get(char2) > 0) maxHeap.add(char2);
+        
+        int max = 0;
+        char maxC = 'a';
+        int total = 0;
+        for (int i=0; i<charCount.length; i++) {
+            total += charCount[i];
+            if (charCount[i] > max) {
+                max = charCount[i];
+                maxC = (char)(i+'a');
+            }
         }
-
-        if (!maxHeap.isEmpty()) {
-            char ch = maxHeap.poll();
-            if (freqMap.get(ch) > 1) return "";
-            res.append(ch);
+        
+        if (total-max < max-1) return "";
+        
+        
+        char[] res = new char[s.length()];
+        int idx = 0;
+        while (charCount[maxC-'a'] > 0) {
+            res[idx] = maxC;
+            idx += 2;
+            charCount[maxC-'a']--;
         }
-
-        return res.toString();
+        for (int i = 0; i < charCount.length; i++) {
+            while (charCount[i] > 0) {
+                if (idx >= res.length) {
+                    idx = 1;
+                }
+                res[idx] = (char) (i + 'a');
+                idx += 2;
+                charCount[i]--;
+            }
+        }
+        return String.valueOf(res);
     }
 }
