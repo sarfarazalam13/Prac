@@ -1,43 +1,64 @@
-public class Solution {
+class Solution {
     public List<String> fullJustify(String[] words, int maxWidth) {
-        List<String> res = new ArrayList<>();
-        List<String> curWords = new ArrayList<>();
-        int curLen = 0;
+        List<String> result = new ArrayList<>();
+        int index = 0; // next word
+        while (index < words.length) {
+            index = addLine(result, words, maxWidth, index); // move index forward
+        }
+        return result;
+    }
 
-        for (String word : words) {
-            if (curLen + word.length() + curWords.size() > maxWidth) {
-                int totalSpaces = maxWidth - curLen;
-                int gaps = curWords.size() - 1;
-                if (gaps == 0) {
-                    res.add(curWords.get(0) + " ".repeat(totalSpaces));
-                } else {
-                    int spacePerGap = totalSpaces / gaps;
-                    int extraSpaces = totalSpaces % gaps;
-                    StringBuilder line = new StringBuilder();
-                    for (int i = 0; i < curWords.size(); i++) {
-                        line.append(curWords.get(i));
-                        if (i < gaps) {
-                            line.append(" ".repeat(spacePerGap));
-                            if (i < extraSpaces) {
-                                line.append(' ');
-                            }
-                        }
-                    }
-                    res.add(line.toString());
-                }
-                curWords.clear();
-                curLen = 0;
+    private int addLine(List<String> result, String[] words, int maxWidth, int start) {
+        StringBuilder sb = new StringBuilder();
+        int end = start;
+        int sum = 0;
+        while (end < words.length) {
+            String word = words[end];
+            assert word.length() <= maxWidth;
+            if (sum + word.length() + (end - start) > maxWidth) { // cannot pack
+                genLineJustified(sb, words, maxWidth - sum, start, end);
+                addSpace(sb, maxWidth - sb.length());
+                break;
+            } else {
+                sum += word.length();
             }
-            curWords.add(word);
-            curLen += word.length();
+            end++;
         }
-
-        StringBuilder lastLine = new StringBuilder(String.join(" ", curWords));
-        while (lastLine.length() < maxWidth) {
-            lastLine.append(' ');
+        if (end == words.length) { // last line
+            assert sb.isEmpty();
+            genLine(sb, words, start, maxWidth);
         }
-        res.add(lastLine.toString());
+        result.add(sb.toString());
+        return end;
+    }
 
-        return res;
+    private void genLine(StringBuilder sb, String[] words, int start, int maxWidth) {
+        for (int i=start; i<words.length; i++) {
+            if (!sb.isEmpty()) {
+                sb.append(' ');
+            }
+            sb.append(words[i]);
+        }
+        addSpace(sb, maxWidth - sb.length());
+    }
+
+    private void genLineJustified(StringBuilder sb, String[] words, int spaceCount, int start, int exclusiveEnd) {
+        int gapCount = exclusiveEnd - start - 1;
+        for (int i=start; i<exclusiveEnd; i++) {
+            if (!sb.isEmpty()) {
+                int count = spaceCount / gapCount;
+                if (i - start - 1 < spaceCount % gapCount) {
+                    count++;
+                }
+                addSpace(sb, count);
+            }
+            sb.append(words[i]);
+        }
+    }
+
+    private void addSpace(StringBuilder sb, int count) {
+        for (int i=0; i<count; i++) {
+            sb.append(' ');
+        }
     }
 }
