@@ -1,62 +1,106 @@
-class Solution {
-    int[] xDir = {0,0,-1,1};
-    int[] yDir = {-1,1,0,0};
-    public boolean isSafe(int[][] grid,int i,int j,boolean[][] visited)
-    {
-        return(i>=0 && j>=0 && i<grid.length  && j<grid[0].length && visited[i][j] == false && grid[i][j] == 1);
-    }
-    public void islandCount(int[][] grid,int i,int j,boolean[][] visited)
-    {
-        visited[i][j] = true;
-        for(int k = 0;k<4;k++)
-        {
-            int newRow = i+xDir[k];
-            int newCol = j+yDir[k];
-            if(isSafe(grid,newRow,newCol,visited))
-            {
-                islandCount(grid,newRow,newCol,visited);
-            }
+
+@SuppressWarnings("java:S107")
+public class Solution {
+
+  private final int[][] dirs = { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };
+
+  public int minDays(int[][] grid) {
+    int m = grid.length;
+    int n = grid[0].length;
+    int numOfIslands = 0;
+    boolean hasArticulationPoint = false;
+    int color = 1;
+    int minIslandSize = m * n;
+    int[][] time = new int[m][n];
+    int[][] low = new int[m][n];
+    for (int i = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
+        if (grid[i][j] == 1) {
+          numOfIslands++;
+          color++;
+          List<Integer> articulationPoints = new ArrayList<>();
+          int[] islandSize = new int[1];
+          tarjan(
+            i,
+            j,
+            -1,
+            -1,
+            0,
+            time,
+            low,
+            grid,
+            articulationPoints,
+            color,
+            islandSize
+          );
+          minIslandSize = Math.min(minIslandSize, islandSize[0]);
+          if (!articulationPoints.isEmpty()) {
+            hasArticulationPoint = true;
+          }
         }
+      }
     }
-    public int CountLand(int[][] grid,boolean[][] visited)
-    {
-        int count = 0;
-        for(int i = 0;i<grid.length;i++)
-        {
-            for(int j = 0;j<grid[0].length;j++)
-            {
-                if(grid[i][j] == 1 && visited[i][j] == false)
-                {
-                    islandCount(grid,i,j,visited);
-                    count++;
-                }
-            }
+    if (numOfIslands >= 2) {
+      return 0;
+    }
+    if (numOfIslands == 0) {
+      return 0;
+    }
+    if (numOfIslands == 1 && minIslandSize == 1) {
+      return 1;
+    }
+    return hasArticulationPoint ? 1 : 2;
+  }
+
+  private void tarjan(
+    int x,
+    int y,
+    int prex,
+    int prey,
+    int time,
+    int[][] times,
+    int[][] lows,
+    int[][] grid,
+    List<Integer> articulationPoints,
+    int color,
+    int[] islandSize
+  ) {
+    times[x][y] = time;
+    lows[x][y] = time;
+    grid[x][y] = color;
+    islandSize[0]++;
+    int children = 0;
+    for (int[] dir : dirs) {
+      int nx = x + dir[0];
+      int ny = y + dir[1];
+      if (nx < 0 || ny < 0 || nx >= grid.length || ny >= grid[0].length) {
+        continue;
+      }
+      if (grid[nx][ny] == 1) {
+        children++;
+        tarjan(
+          nx,
+          ny,
+          x,
+          y,
+          time + 1,
+          times,
+          lows,
+          grid,
+          articulationPoints,
+          color,
+          islandSize
+        );
+        lows[x][y] = Math.min(lows[x][y], lows[nx][ny]);
+        if (prex != -1 && lows[nx][ny] >= time) {
+          articulationPoints.add(x * grid.length + y);
         }
-        return count;
+      } else if ((nx != prex || ny != prey) && grid[nx][ny] != 0) {
+        lows[x][y] = Math.min(lows[x][y], times[nx][ny]);
+      }
     }
-    public int minDays(int[][] grid) {
-        int rows = grid.length;
-        int cols = grid[0].length;
-        boolean[][] visited = new boolean[rows][cols];
-        int count = CountLand(grid,visited);
-        if(count > 1 || count == 0) return 0;
-        for(int i = 0;i<rows;i++)
-        {
-            for(int j = 0;j<cols;j++)
-            {
-                if(grid[i][j] == 1)
-                {
-                    grid[i][j] = 0;
-                    boolean[][] mat = new boolean[rows][cols];
-                    int count2 = CountLand(grid,mat);
-                    grid[i][j] = 1;
-                    if(count2 > 1 || count2 == 0)
-                    {
-                        return 1;   
-                    }
-                }
-            }
-        }
-        return 2;
+    if (prex == -1 && children > 1) {
+      articulationPoints.add(x * grid.length + y);
     }
+  }
 }
