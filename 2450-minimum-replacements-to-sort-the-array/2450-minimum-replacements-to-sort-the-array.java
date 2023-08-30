@@ -1,15 +1,15 @@
-public class Solution {
+class Solution {
     public long minimumReplacement(int[] nums) {
-        long operations = 0;
-        long prev_bound = nums[nums.length - 1];
-        
-        for (int i = nums.length - 2; i >= 0; i--) {
-            long num = nums[i];
-            long no_of_times = (num + prev_bound - 1) / prev_bound;
-            operations += no_of_times - 1;
-            prev_bound = num / no_of_times;
+        int n=nums.length , prev=nums[n-1];;
+        long ans=0;
+        for(int i=n-2;i>=0;i--){
+            int noOfTime=nums[i]/prev; 
+            if((nums[i])%prev!=0){
+			    noOfTime++;
+                prev=nums[i]/noOfTime;
+            }   
+            ans+=noOfTime-1;
         }
-        
-        return operations;
+        return ans;
     }
 }
