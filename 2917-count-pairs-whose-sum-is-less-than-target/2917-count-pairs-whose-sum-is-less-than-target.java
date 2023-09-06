@@ -1,19 +1,18 @@
 class Solution {
     public int countPairs(List<Integer> nums, int target) {
-        Collections.sort(nums); // sort the vector nums
-        int count = 0; // variable to store the count
-        int left = 0; // variable to store the left
-        int right = nums.size()-1; // variable to store the right
-        while(left < right){ // loop until left is less than right
-            if(nums.get(left) + nums.get(right) < target){ 
-                count += right-left; 
-                left++; // increment the left
-            }
-            else{ // else
-                right--; // decrement the right
+        int pairs = 0;
+        int n = nums.size();
+
+        for(int i=0; i<n-1; i++){
+            int a = nums.get(i);
+
+            for(int j=i+1; j<n; j++){
+                int b = nums.get(j);
+
+                if((a+b) < target) pairs++;
             }
         }
-        return count; // return the count
-        
+
+        return pairs;
     }
 }
