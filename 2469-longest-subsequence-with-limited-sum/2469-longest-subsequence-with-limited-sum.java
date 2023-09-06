@@ -1,28 +1,21 @@
 class Solution {
     public int[] answerQueries(int[] nums, int[] queries) {
-        int ans[]=new int[queries.length];
-        Arrays.sort(nums); 
-     
-        int sum=0,count=0;
-        for(int i=0;i<queries.length;i++)
-        {
-           
-           for(int j=0;j<nums.length;j++)
-           {
-             sum+=nums[j];
-              if(sum <= queries[i]){
-                    count++;
-                }
-                else{
-                    break;
-                }
-           }
-
-                ans[i] = count;
-            count = 0;
-            sum = 0;
-           
+        int n = nums.length;
+        int m = queries.length;
+        Arrays.sort(nums);
+        int prefixSum[] = new int[n];
+        prefixSum[0] = nums[0];
+        for(int i = 1;i < n;i++)
+            prefixSum[i] = prefixSum[i-1] + nums[i];
+        int result[] = new int[m];
+        for(int i = 0;i < m;i++) {
+            int query = queries[i];
+            int index = Arrays.binarySearch(prefixSum, query);
+            if(index < 0)
+                result[i] = -(index+1);
+            else
+                result[i] = index+1; 
         }
-        return ans;
+        return result;
     }
 }
