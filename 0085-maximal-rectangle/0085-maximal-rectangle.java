@@ -1,57 +1,35 @@
 class Solution {
     public int maximalRectangle(char[][] matrix) {
-
-        int max = 0;
-
-        int m = matrix.length;
-        int n = matrix[0].length;
-
-        int arr[] = new int[n];
-
-        for(int i = 0; i < m; i++){
-            for(int j = 0; j < n; j++){
-                if(matrix[i][j] == '0'){
-                    arr[j] = 0;
-                } else {
-                    arr[j] += 1;
-                }
-            }
-
-            max = Math.max(max, helper(arr));
+        if (matrix.length < 1) return 0;
+        int[] bars = new int[matrix[0].length];
+        add(bars, matrix[0]);
+        int maxArea = largestRectangleArea(bars);
+        for (int y = 1; y < matrix.length; y++) {
+            add(bars, matrix[y]);
+            maxArea = Math.max(maxArea, largestRectangleArea(bars));
         }
-
-        return max;
+        return maxArea;
     }
 
-    public int helper(int[] arr){
-        Deque<Pair<Integer, Integer>> st = new ArrayDeque<>();
+    private void add(int[] c1, char[] c2) {
+        for (int i = 0; i < c2.length; i++)
+            if (c2[i] == '1') c1[i]++;
+            else c1[i] = 0;
+    }
 
-        int max = 0;
-
-        for(int i = 0; i < arr.length; i++){
-            int idx = i;
-
-            while(st.size() > 0 && st.peek().getKey() >= arr[i]){
-                Pair<Integer, Integer> p = st.pop();
-
-                idx = p.getValue();
-
-                int area = p.getKey()*(i - idx);
-
-                max = Math.max(max, area);
+    public int largestRectangleArea(int[] heights) {
+        int[] stack = new int[heights.length];
+        int p = -1, i = 0, max = 0;
+        while (i <= heights.length) {
+            // NB: this doesn't run when i == heights.length
+            // if stack is empty or current height > top of stack, i.e. heights no longer strictly increasing
+            if (p == -1 || (i < heights.length && heights[i] > heights[stack[p]])) stack[++p] = i++;
+            else { // right - left -1
+            // if stack is empty, prev is obv -1
+                max = Math.max(max, heights[stack[p]] * (i - (p > 0 ? stack[p-1] : -1) - 1));
+                p--; //pop the stack
             }
-
-            st.push(new Pair<>(arr[i], idx));
         }
-
-        while(st.size() > 0){
-            Pair<Integer, Integer> p = st.pop();
-
-            int area = p.getKey()*(arr.length - p.getValue());
-
-            max = Math.max(max, area);
-        }
-
         return max;
     }
 }
