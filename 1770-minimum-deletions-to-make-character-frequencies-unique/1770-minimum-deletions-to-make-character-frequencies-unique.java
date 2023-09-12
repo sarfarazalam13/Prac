@@ -1,21 +1,22 @@
-public class Solution {
-    public int minDeletions(String s) {
-        HashMap<Character, Integer> cnt = new HashMap<>();
-        int deletions = 0;
-        HashSet<Integer> used_frequencies = new HashSet<>();
-        
-        for (char c : s.toCharArray()) {
-            cnt.put(c, cnt.getOrDefault(c, 0) + 1);
+class Solution {
+     public int minDeletions(String s) {
+        int[] arr = new int[26];
+        int res = 0;
+        for (char ch : s.toCharArray()) {
+            arr[ch - 'a']++;
         }
-        
-        for (int freq : cnt.values()) {
-            while (freq > 0 && used_frequencies.contains(freq)) {
+        Set<Integer> used = new HashSet<>();
+        for (int i = 0; i < 26; i++) {
+            int freq = arr[i];
+            while (freq > 0) {
+                if (!used.contains(freq)) {
+                    used.add(freq);
+                    break;
+                } 
                 freq--;
-                deletions++;
+                res++;
             }
-            used_frequencies.add(freq);
         }
-        
-        return deletions;
+        return res; 
     }
 }
