@@ -1,37 +1,51 @@
-class Solution {
+ class Solution {
     public List<Integer> majorityElement(int[] nums) {
-        List<Integer>ans=new ArrayList<>();
-        int ele1=Integer.MIN_VALUE,ele2=Integer.MIN_VALUE,cnt1=0,cnt2=0;
-        for(int i=0;i<nums.length;i++)
-        {
-            if(cnt1==0 && ele2!=nums[i])
-            {
-                cnt1=1;
-                ele1=nums[i];
-            }
-            else if(cnt2==0 && ele1!=nums[i])
-            {
-                cnt2=1;
-                ele2=nums[i];
-            }
-            else if(nums[i]==ele1)cnt1++;
-            else if(nums[i]==ele2)cnt2++;
-            else
-            {
-               cnt1--;
-               cnt2--;
+        return takeMyKnees(nums);
+    }
+
+    public List<Integer> takeMyKnees(int[] nums) {
+        List<Integer> list = new ArrayList();
+
+        quickSort(nums, 0, nums.length - 1, list);
+
+        return list;
+    }
+
+    public void quickSort(int[] nums, int lo, int hi, List<Integer> ans) {
+        if (hi - lo + 1 <= nums.length / 3) {
+            return;
+        }
+
+        int left = lo;
+        int right = hi;
+        int i = lo + 1;
+
+        while (right >= i) {
+            if (nums[left] > nums[i]) {
+                swap(nums, left, i);
+                i++;
+                left++;
+            } else if (nums[left] < nums[i]) {
+                if (nums[i] > nums[right]) {
+                    swap(nums, i, right);
+                }
+                right--;
+            } else {
+                i++;
             }
         }
-       cnt1=cnt2=0;
-       for(int i=0;i<nums.length;i++)
-       {
-           if(ele1==nums[i])cnt1++;
-           if(ele2==nums[i])cnt2++;
-       }
-       int min=(int)(nums.length/3)+1;
-       if(cnt1>=min)ans.add(ele1);
-       if(cnt2>=min)ans.add(ele2);
-       //Collections.sort(ans);
-        return ans; 
+
+        if (right - left >= nums.length / 3) {
+            ans.add(nums[left]);
+        }
+
+        quickSort(nums, lo, left - 1, ans);
+        quickSort(nums, right + 1, hi, ans);
     }
-}
+
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+ }
