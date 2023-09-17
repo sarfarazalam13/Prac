@@ -31,7 +31,7 @@ class Solution {
        int min=(int)(nums.length/3)+1;
        if(cnt1>=min)ans.add(ele1);
        if(cnt2>=min)ans.add(ele2);
-       Collections.sort(ans);
+       //Collections.sort(ans);
         return ans; 
     }
 }
