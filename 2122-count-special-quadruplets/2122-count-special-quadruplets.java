@@ -1,21 +1,33 @@
 class Solution {
     public int countQuadruplets(int[] nums) {
-        int res = 0;
-        int len = nums.length;
+
+        // Map<Integer, Integer> diffMap = new HashMap();
+
+        int[] diffArr = new int[201];
         
-        Map<Integer, Integer> count = new HashMap<>();
-        count.put(nums[len-1] - nums[len-2], 1);
-        
-        for (int b = len - 3; b >= 1; b--) {
-            for (int a = b - 1; a >= 0; a--) {
-                res += count.getOrDefault(nums[a] + nums[b], 0);
+        int result = 0;
+
+        for(int b = nums.length - 3; b > 0; b--) {
+            int c = b + 1;
+            int d = c + 1;
+
+            while(d < nums.length) {
+                int diff = nums[d++] - nums[c];
+                // diffMap.put(diff, diffMap.getOrDefault(diff, 0) + 1);
+
+                if(diff > 0)
+                    diffArr[diff]++;
             }
-            
-            for (int x = len - 1; x > b; x--) {
-                count.put(nums[x] - nums[b], count.getOrDefault(nums[x] - nums[b], 0) + 1);
+
+            int a = b - 1;
+
+            while(a >= 0) {
+                // result += diffMap.getOrDefault(nums[a--] + nums[b], 0);
+                result += diffArr[nums[a--] + nums[b]];
             }
         }
+
+        return result;
         
-        return res;
     }
 }
