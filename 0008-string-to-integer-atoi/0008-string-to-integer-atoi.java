@@ -1,43 +1,39 @@
 class Solution {
     public int myAtoi(String s) {
-
-
-        int num = 0;
-        int neg = 1;
-        int i = 0;
-        for(char c : s.toCharArray()){
-            if(c != ' ' )
-                i++;
-          
-            if(num ==0 ){
-                if( c == '-' || c == '+' ){
-                    neg = c == '-' ? -1 : 1;
-                
-                    if(i > 1)
-                        return 0;
-                    continue;
-                }
-            }
-            if(Character.isDigit(c)){
-
-                int digit=  c - '0';
-                if(Integer.MAX_VALUE/10 < num || Integer.MAX_VALUE/10 == num && Integer.MAX_VALUE %10 < digit){
-                    return neg == -1 ? Integer.MIN_VALUE : Integer.MAX_VALUE ;
-
-                }
-               
-                num = num * 10 + c - '0';
-            }
-            else if(!Character.isDigit(c) && c != ' ' && num != 0 ){
-                return num * neg;
-            } else if(c != ' '){
-                return num * neg;
-            } else if(c == ' ' && i >= 1){
-                return num*neg;
-            }
-            
+        int i=0;
+        int n=s.length();
+        while(i<n && s.charAt(i)==' ')
+            i++;
+        int positive=0,negative=0;
+        if(i<n && s.charAt(i)=='+')
+        {
+            positive++;
+            i++;
         }
-        return num * neg;
-        
+        if(i<n && s.charAt(i)=='-')
+        {
+            negative++;
+            i++;
+        }
+
+        if(positive>0 && negative>0)
+            return 0;
+        long  res=0;
+        while(i<n && s.charAt(i)>='0' && s.charAt(i)<='9')
+        {
+            res=res*10+(s.charAt(i)-'0');
+            i++;
+
+            if(res>(Math.pow(2,31)-1)&& negative==0)
+                    return (int)(Math.pow(2,31)-1);
+
+            else if(res>(Math.pow(2,31)-1))
+                return (int)Math.pow(-2,31);
+        }
+
+        if(negative>0)
+            res =-1*res;
+
+        return (int)res;
     }
 }
