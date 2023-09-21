@@ -1,23 +1,59 @@
 class Solution {
     public String intToRoman(int num) {
-     
-        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-        String[] romanNumerals = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
-
-        StringBuilder sb = new StringBuilder();
-
-        int i = 0;
-    
-        while (num > 0) {
-            if (num >= values[i]) {
-                
-                sb.append(romanNumerals[i]);
-                num -= values[i];
-            } else {
-                i++;
-            }
+        StringBuilder romanNumeral = new StringBuilder();
+        while (num >= 1000) {
+            romanNumeral.append("M");
+            num -= 1000;
+        }
+        while (num >= 900) {
+            romanNumeral.append("CM");
+            num -= 900;
+        }
+        while (num >= 500) {
+            romanNumeral.append("D");
+            num -= 500;
+        }
+        while (num >= 400) {
+            romanNumeral.append("CD");
+            num -= 400;
+        }
+        while (num >= 100) {
+            romanNumeral.append("C");
+            num -= 100;
+        }
+        while (num >= 90) {
+            romanNumeral.append("XC");
+            num -= 90;
+        }
+        while (num >= 50) {
+            romanNumeral.append("L");
+            num -= 50;
+        }
+        while (num >= 40) {
+            romanNumeral.append("XL");
+            num -= 40;
+        }
+        while (num >= 10) {
+            romanNumeral.append("X");
+            num -= 10;
+        }
+        while (num >= 9) {
+            romanNumeral.append("IX");
+            num -= 9;
+        }
+        while (num >= 5) {
+            romanNumeral.append("V");
+            num -= 5;
+        }
+        while (num >= 4) {
+            romanNumeral.append("IV");
+            num -= 4;
+        }
+        while (num >= 1) {
+            romanNumeral.append("I");
+            num -= 1;
         }
 
-        return sb.toString();
+        return romanNumeral.toString();
     }
 }
