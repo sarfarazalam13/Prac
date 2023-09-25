@@ -1,19 +1,19 @@
 class Solution {
-    public int[] finalPrices(int[] prices) {
-        int arr[] = new int[prices.length];
-        int i;
-        int j;
-        for(i = 0; i < prices.length; i++) {
-            for(j = i + 1; j < prices.length; j++) {
+     public int[] finalPrices(int[] prices) {
+        int n = prices.length;
+
+        for(int i = 0; i < n - 1; i++) {
+            for(int j = i + 1; j < n; j++) {
                 if(prices[j] <= prices[i]) {
-                    arr[i] = prices[i] - prices[j];
+                    prices[i] -= prices[j];
                     break;
                 }
             }
-            if(j == prices.length) {
-                arr[i] = prices[i];
-            }
         }
-        return arr;
+
+        System.gc();
+
+        return prices;
+
     }
 }
