@@ -1,19 +1,20 @@
 class Solution {
-     public int[] finalPrices(int[] prices) {
-        int n = prices.length;
 
-        for(int i = 0; i < n - 1; i++) {
-            for(int j = i + 1; j < n; j++) {
-                if(prices[j] <= prices[i]) {
-                    prices[i] -= prices[j];
+    static void searchDiscount(int i, int[] prices){
+        if(i < prices.length-1){
+            for(int j=i+1; j<prices.length; j++){
+                if(prices[j] <= prices[i]){
+                    prices[i] = prices[i] - prices[j];
                     break;
                 }
             }
         }
+    }
 
-        System.gc();
-
+    public int[] finalPrices(int[] prices) {
+        for(int i=0; i<prices.length; i++){
+            searchDiscount(i,prices);
+        }
         return prices;
-
     }
 }
