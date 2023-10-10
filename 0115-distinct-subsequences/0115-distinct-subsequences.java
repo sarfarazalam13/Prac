@@ -1,25 +1,39 @@
 class Solution {
-    public int numDistinct(String S, String T) {
-    // array creation
-    int[][] mem = new int[T.length()+1][S.length()+1];
-
-    // filling the first row: with 1s
-    for(int j=0; j<=S.length(); j++) {
-        mem[0][j] = 1;
-    }
     
-    // the first column is 0 by default in every other rows but the first, which we need.
+    private String s;
+    private String t;
+    private int sn;
+    private int tn;
+    private Integer memo[][];
     
-    for(int i=0; i<T.length(); i++) {
-        for(int j=0; j<S.length(); j++) {
-            if(T.charAt(i) == S.charAt(j)) {
-                mem[i+1][j+1] = mem[i][j] + mem[i+1][j];
-            } else {
-                mem[i+1][j+1] = mem[i+1][j];
-            }
+    private int check(int si, int ti) {
+        if (si == sn || ti == tn || sn - si < tn - ti) {
+            return ti == tn ? 1 : 0;
         }
+        if (ti == tn) {
+            return 1;
+        }
+        if (si == sn) {
+            return 0;
+        }
+        if (memo[si][ti] != null) {
+            return memo[si][ti];
+        }
+        int count = check(si + 1, ti);
+        if (s.charAt(si) == t.charAt(ti)) {
+            count += check(si + 1, ti + 1);
+        }
+        memo[si][ti] = count;
+        return count;
     }
     
-    return mem[T.length()][S.length()];
-}
+    public int numDistinct(String s, String t) {
+        this.s = s;
+        this.t = t;
+        this.sn = s.length();
+        this.tn = t.length();
+        this.memo = new Integer[sn][tn];
+        return check(0, 0);
+    }
+    
 }
