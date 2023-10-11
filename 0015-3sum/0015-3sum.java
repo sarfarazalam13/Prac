@@ -1,29 +1,33 @@
+import java.util.*;
 class Solution {
+    private List<List<Integer>> res;
     public List<List<Integer>> threeSum(int[] nums) {
-        Arrays.sort(nums);
-        List<List<Integer>> result = new LinkedList<>();
-       for(int i=0;i<nums.length-2;i++){
-           if(i==0 ||(i>0 && nums[i]!=nums[i-1])){
-               int low=i+1;
-               int high=nums.length-1;
-               int sum=0-nums[i];
-               while(low<high){
-                   if(nums[low]+nums[high]==sum){
-                       result.add(Arrays.asList(nums[i],nums[low],nums[high]));
-                       while(low<high && nums[low]==nums[low+1])    low++;
-                       while(low<high && nums[high]==nums[high-1])  high--;
-                       low++;
-                       high--;
-                   }
-                   else if(nums[low]+nums[high]<sum){
-                       low++;
-                   }
-                   else{
-                       high--;
-                   }
-               }
-           }
-       }
-       return result; 
+        return new AbstractList<List<Integer>>() {
+            public List<Integer> get(int index) {
+                init();
+                return res.get(index);
+            }
+            public int size() {
+                init();
+                return res.size();
+            }
+            private void init() {
+                if (res != null) return;
+                Arrays.sort(nums);
+                int l, r, sum;
+                Set<List<Integer>> tempRes = new HashSet<>();
+                for(int i = 0; i < nums.length - 2; ++i) {
+                    l = i + 1;
+                    r = nums.length - 1;
+                    while(l < r) {
+                        sum = nums[i] + nums[l] + nums[r];
+                        if (sum == 0) tempRes.add(Arrays.asList(nums[i], nums[l], nums[r]));
+                        if (sum < 0) ++l; else --r;
+                    }
+                }
+                res = new ArrayList<List<Integer>>(tempRes);
+            }
+            
+        };
     }
 }
