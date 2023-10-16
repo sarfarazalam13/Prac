@@ -9,36 +9,17 @@
  * }
  */
 class Solution {
-    int mul(ListNode head)
-    {
-        if(head==null)
-        {
-            return 0;
-        }
-        int t=head.val*2+mul(head.next);
-        head.val=t%10;
-        return t/10;
-    }
     public ListNode doubleIt(ListNode head) {
-        int t=mul(head);
-        if(t!=0)
-        {
-            head=new ListNode(t,head);
+        //basically the concept is if there is any first node which will be more than 4, that means there is the possibility of having a carry value so for that we will be having a dummy node initialized with dummy value of 0 , so if there is any case of carry that dummy node will have value of 2*0+carry(1)....yep.
+        
+        if(head.val  >= 5 )  {
+             head = new ListNode(0,head);
+        }
+        for(ListNode node = head; node!=null; node=node.next){
+            node.val=2*(node.val)%10;
+            System.out.println(node.val);
+            if(node.next!=null && node.next.val >4) node.val++;
         }
         return head;
-        
     }
 }
-// class Solution {
-//     private int multiply(ListNode head){
-//         if(head == null) return 0;
-//         int t = head.val*2 + multiply(head.next);
-//         head.val = t%10;
-//         return t/10;
-//     }
-//     public ListNode doubleIt(ListNode head) {
-//         int t = multiply(head);
-//         if(t != 0) head = new ListNode(t, head);
-//         return head;
-//     }
-// }
