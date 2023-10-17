@@ -1,51 +1,51 @@
 class Solution {
     public boolean validateBinaryTreeNodes(int n, int[] leftChild, int[] rightChild) {
-        Map<Integer, List<Integer>> graph = new HashMap<>();
-        int[] inDegree = new int[n];
 
-        for (int node = 0; node < n; node++) {
-            int left = leftChild[node];
-            int right = rightChild[node];
-            if (left != -1) {
-                graph.computeIfAbsent(node, k -> new ArrayList<>()).add(left);
-                inDegree[left]++;
-            }
-            if (right != -1) {
-                graph.computeIfAbsent(node, k -> new ArrayList<>()).add(right);
-                inDegree[right]++;
-            }
+    int[] inDegree = new int[n];
+    int root = -1;
+
+    // If inDegree of any node > 1, return false
+    for (final int child : leftChild)
+      if (child != -1 && ++inDegree[child] == 2)
+        return false;
+
+    for (final int child : rightChild)
+      if (child != -1 && ++inDegree[child] == 2)
+        return false;
+
+    // Find the root (node with inDegree == 0)
+    for (int i = 0; i < n; ++i)
+      if (inDegree[i] == 0)
+        if (root == -1)
+          root = i;
+        else
+          return false; // Multiple roots
+
+    // didn't find the root
+    if (root == -1)
+      return false;
+
+    // Perform DFS from the root
+        boolean[] visited = new boolean[n];
+        if(!dfs(root, leftChild, rightChild, visited)) return false;
+
+        //Return false if there exists any node that cannot be reached from the root.
+        for(boolean v: visited) if(!v) return false;
+        return true;
+    }
+
+    private boolean dfs(int source, int[] leftChild, int[] rightChild, boolean[] visited) {
+        visited[source] = true;
+        int left = leftChild[source], right = rightChild[source];
+        
+        if(left >= 0) {
+            if(visited[left] || !dfs(left, leftChild, rightChild, visited)) return false;
         }
 
-        List<Integer> rootCandidates = new ArrayList<>();
-        for (int node = 0; node < n; node++) {
-            if (inDegree[node] == 0) {
-                rootCandidates.add(node);
-            }
+        if(right >= 0) {
+            if(visited[right] || !dfs(right, leftChild, rightChild, visited)) return false;
         }
 
-        if (rootCandidates.size() != 1) {
-            return false;
-        }
-        int root = rootCandidates.get(0);
-
-        Queue<Integer> queue = new LinkedList<>();
-        Set<Integer> seen = new HashSet<>();
-        queue.add(root);
-        seen.add(root);
-
-        while (!queue.isEmpty()) {
-            int node = queue.poll();
-            if (graph.containsKey(node)) {
-                for (int child : graph.get(node)) {
-                    if (seen.contains(child)) {
-                        return false;
-                    }
-                    seen.add(child);
-                    queue.add(child);
-                }
-            }
-        }
-
-        return seen.size() == n;
+        return true;
     }
 }
