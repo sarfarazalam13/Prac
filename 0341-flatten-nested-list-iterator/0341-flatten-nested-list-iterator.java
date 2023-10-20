@@ -15,34 +15,51 @@
  *     public List<NestedInteger> getList();
  * }
  */
-public class NestedIterator {
-    private List<Integer> flattened;
-    private int index;
+public class NestedIterator implements Iterator<Integer> {
+    private Deque<ListIterator<NestedInteger>> itStack;
+    private Integer currInt;
 
     public NestedIterator(List<NestedInteger> nestedList) {
-        flattened = new ArrayList<>();
-        index = 0;
-        flattened = flatten(nestedList);
+        itStack = new ArrayDeque<>();
+        itStack.push(nestedList.listIterator());
     }
 
-    private List<Integer> flatten(List<NestedInteger> nested) {
-        List<Integer> result = new ArrayList<>();
-        for (NestedInteger ni : nested) {
-            if (ni.isInteger()) {
-                result.add(ni.getInteger());
-            } else {
-                result.addAll(flatten(ni.getList()));
-            }
+    @Override
+    public Integer next() {
+        if (!hasNext()) {
+            return null;
         }
-        return result;
+
+        Integer nextVal = currInt;
+        currInt = null;
+        return nextVal;
     }
 
-    public int next() {
-        return flattened.get(index++);
-    }
-
+    @Override
     public boolean hasNext() {
-        return index < flattened.size();
+        getNextInt();
+        return currInt != null;
+    }
+
+    private void getNextInt() {
+        if (currInt != null) {
+            return;
+        }
+
+        while (!itStack.isEmpty()) {
+            if (!itStack.peek().hasNext()) {
+                itStack.pop();
+                continue;
+            }
+
+            NestedInteger nextNested = itStack.peek().next();
+            if (nextNested.isInteger()) {
+                currInt = nextNested.getInteger();
+                return;
+            }
+
+            itStack.push(nextNested.getList().listIterator());
+        }
     }
 }
 
