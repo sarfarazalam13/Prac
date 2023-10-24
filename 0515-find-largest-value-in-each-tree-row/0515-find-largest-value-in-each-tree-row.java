@@ -13,23 +13,40 @@
  *     }
  * }
  */
- class Solution {
+
+import java.util.AbstractList; 
+class Solution {
+    private List<Integer> res; 
     public List<Integer> largestValues(TreeNode root) {
-        List <Integer> list =new ArrayList();
-        if(root==null) return list;
-        Queue <TreeNode> q= new LinkedList<>();
-        q.add(root);
-        while(!q.isEmpty()){
-            int size=q.size();
-            int max=Integer.MIN_VALUE;
-            for (int i = 0; i < size; i++) {
-                TreeNode node= q.poll();
-                if(node.left!=null) q.add(node.left);
-                if(node.right!=null) q.add(node.right);
-                max= Math.max(max, node.val);
+        return new AbstractList<Integer>() {
+            @Override 
+            public Integer get(int index) {
+                init(); 
+                return res.get(index); 
             }
-            list.add(max);
+            @Override 
+            public int size() {
+                init(); 
+                return res.size(); 
+            }
+            protected void init() {
+                if (res != null)
+                    return; 
+                res = new ArrayList<Integer>(); 
+                dfsHelper(root, -1); 
+            }
+        }; 
+    }
+    private void dfsHelper(TreeNode root, int parentDepth) {
+        if (root == null)
+            return; 
+        ++parentDepth;
+        if (res.size() == parentDepth) {
+            res.add(root.val); 
+        } else {
+            res.set(parentDepth, Math.max(root.val, res.get(parentDepth)));
         }
-        return list;
+        dfsHelper(root.left, parentDepth); 
+        dfsHelper(root.right, parentDepth); 
     }
 }
