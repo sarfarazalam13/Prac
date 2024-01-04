@@ -1,37 +1,29 @@
-import java.util.HashMap;
-import java.util.Map;
-
 class Solution {
     public int minOperations(int[] nums) {
-        // Create a HashMap to store the frequency of each element in 'nums'
-        Map<Integer, Integer> mp = new HashMap<>();
-        
-        // Count the frequency of each element in 'nums'
-        for (int num : nums) {
-            // Put the element in the map and increment its count by 1
-            mp.put(num, mp.getOrDefault(num, 0) + 1);
-        }
-        
-        // Initialize a variable to count the minimum operations needed
-        int count = 0;
-        
-        // Iterate through the entries in the HashMap
-        for (Map.Entry<Integer, Integer> entry : mp.entrySet()) {
-            // Get the frequency count of the current element
-            int t = entry.getValue();
+        Arrays.sort(nums);
+
+        int res = 0;
+        int s = 0;
+        while(s < nums.length){
+            int e = s;
             
-            // If there is only one occurrence of any element, it's not possible to make it divisible by 3
-            if (t == 1)
-                return -1;
-            
-            // Calculate the number of operations needed to make the frequency divisible by 3
-            count += t / 3; // Count the complete sets of 3 elements
-            if (t % 3 != 0) // If there are remaining elements, increment the count
-                count++;
+            while(e < nums.length && nums[e] == nums[s]) {
+                e++;
+            }
+            int count = e-s;
+            if(count == 1) return -1;
+            res += count/3;
+
+            if(count%3 != 0) res++;
+            s=e;
         }
-        
-        // Return the total count of operations needed
-        return count;
+        return res;
+       
     }
 }
+// 11 -> 4
+// 10/3 + 1 -> 4
 
+// 7 
+
+// 0 1 2
