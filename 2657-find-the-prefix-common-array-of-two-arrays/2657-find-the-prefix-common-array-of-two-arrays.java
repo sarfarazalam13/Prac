@@ -1,16 +1,17 @@
 class Solution {
     public int[] findThePrefixCommonArray(int[] A, int[] B) {
-        int cur=0, ans[]=new int[A.length],seen[]=new int[A.length+1];
+        int len = A.length;
+        int[] res = new int[len];
+        long numA = 0, numB = 0;
 
-        for(int i=0;i<A.length;i++)
-        {
-         if (++seen[A[i]] == 2)
-                cur++;
-            if (++seen[B[i]] == 2)
-                cur++;
-            ans[i] = cur;  
+        for (int i = 0; i < len; i++) {
+            numA |= 1L << A[i];
+            numB |= 1L << B[i];
 
+            long mask = numA & numB;
+            res[i] = Long.bitCount(mask);
         }
-        return ans;
+
+        return res;
     }
 }
