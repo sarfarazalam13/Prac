@@ -1,32 +1,32 @@
-public class Solution {
-    public int numberOfArithmeticSlices(int[] nums) {
+class Solution {
+ public int numberOfArithmeticSlices(int[] nums) {
         int n = nums.length;
-        int total_count = 0;
-
-        HashMap<Integer, Integer>[] dp = new HashMap[n];
-
-        for (int i = 0; i < n; ++i) {
-            dp[i] = new HashMap<>();
+        int[][] dp = new int[n][n];
+        HashMap<Long, ArrayList<Integer>> map = new HashMap<>();
+        for(int i = 0; i < n; i++){
+            long temp = nums[i];
+            if(!map.containsKey(temp)){
+                map.put(temp, new ArrayList<Integer>());
+            }
+            map.get(temp).add(i);
         }
 
-        for (int i = 1; i < n; ++i) {
-            for (int j = 0; j < i; ++j) {
-                long diff = (long) nums[i] - nums[j]; 
-
-                if (diff > Integer.MAX_VALUE || diff < Integer.MIN_VALUE) {
-                    continue; 
+        int sum = 0;
+        for(int i = 1; i < n; i++){
+            for(int j = i + 1; j < n; j++){
+                long a = 2L * nums[i] - nums[j];
+                if(map.containsKey(a) ){
+                    for(int k : map.get(a)){
+                        if(k < i){
+                            dp[i][j] += dp[k][i] + 1;
+                        }else{
+                            break;
+                        }
+                    }
                 }
-
-                int diffInt = (int) diff;
-
-                dp[i].put(diffInt, dp[i].getOrDefault(diffInt, 0) + 1);  
-                if (dp[j].containsKey(diffInt)) {
-                    dp[i].put(diffInt, dp[i].get(diffInt) + dp[j].get(diffInt));
-                    total_count += dp[j].get(diffInt);
-                }
+                sum += dp[i][j];
             }
         }
-
-        return total_count;
+        return sum;
     }
 }
